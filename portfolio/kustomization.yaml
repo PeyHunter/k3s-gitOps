@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - portfolio.yaml
+images:
+  - name: ghcr.io/peyhunter/pey-code-portfolio
+    # CI rewrites the next line on every deploy. Keep it on one line.
+    newTag: "1.0.1"

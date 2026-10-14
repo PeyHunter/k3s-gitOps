@@ -1,0 +1,97 @@
+# 1. The folder
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: portfolio
+---
+# 2. The staffing rule: keep 2 copies running
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portfolio
+  namespace: portfolio
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: portfolio
+  template:
+    metadata:
+      labels:
+        app: portfolio
+    spec:
+      containers:
+        - name: web
+          image: ghcr.io/peyhunter/pey-code-portfolio:1.0.1
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+---
+# 3. The order window: one fixed address for both copies
+apiVersion: v1
+kind: Service
+metadata:
+  name: portfolio
+  namespace: portfolio
+spec:
+  selector:
+    app: portfolio
+  ports:
+    - port: 80
+---
+# 4. The front-door rule: these web addresses → that Service, over HTTPS
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: portfolio
+  namespace: portfolio
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    traefik.ingress.kubernetes.io/router.middlewares: portfolio-redirect-https@kubernetescrd
+spec:
+  tls:
+    - hosts:
+        - peytonhunter.com
+        - www.peytonhunter.com
+      secretName: portfolio-tls
+  rules:
+    - host: peytonhunter.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portfolio
+                port:
+                  number: 80
+    - host: www.peytonhunter.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: portfolio
+                port:
+                  number: 80
+---
+# 5. Send http:// visitors to https://
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: redirect-https
+  namespace: portfolio
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
