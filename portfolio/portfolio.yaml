@@ -11,7 +11,7 @@ metadata:
   name: portfolio
   namespace: portfolio
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: portfolio
