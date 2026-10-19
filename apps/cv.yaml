@@ -1,0 +1,19 @@
+# Copy to k3s-gitops/apps/cv.yaml. The root app picks it up automatically.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cv
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/PeyHunter/k3s-gitops.git
+    targetRevision: main
+    path: cv
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cv
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
