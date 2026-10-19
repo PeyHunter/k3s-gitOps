@@ -1,0 +1,19 @@
+# The root app picks this up automatically.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pathfinder
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/PeyHunter/k3s-gitops.git
+    targetRevision: main
+    path: pathfinder
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: pathfinder
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

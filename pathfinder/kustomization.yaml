@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - pathfinder.yaml
+images:
+  - name: ghcr.io/peyhunter/pathfinder
+    # CI rewrites the next line on every deploy. Keep it on one line.
+    newTag: "sha-f4732d8"
