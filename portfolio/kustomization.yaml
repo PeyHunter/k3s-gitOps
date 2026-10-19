@@ -5,4 +5,4 @@ resources:
 images:
   - name: ghcr.io/peyhunter/pey-code-portfolio
     # CI rewrites the next line on every deploy. Keep it on one line.
-    newTag: "sha-61873b6"
+    newTag: "sha-cca4148"
