@@ -5,4 +5,4 @@ resources:
 images:
   - name: ghcr.io/peyhunter/cv
     # The CV repo's CI rewrites the next line on every release tag. Keep it on one line.
-    newTag: "v1.0.0"
+    newTag: "v1.1.0"
