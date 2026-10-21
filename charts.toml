@@ -12,3 +12,8 @@ version = "v1.16.2"
 repo = "https://argoproj.github.io/argo-helm"
 chart = "argo-cd"
 version = "10.9.3"
+
+[sealed-secrets]
+repo = "https://github.com/bitnami/sealed-secrets/releases/download/helm-v2.20.0/sealed-secrets-2.20.0.tgz"
+chart = "sealed-secrets"
+version = "2.20.0"
