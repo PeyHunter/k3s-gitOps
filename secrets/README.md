@@ -8,11 +8,11 @@ sealed-secrets controller in the cluster can decrypt them.
 | `cloudflare-api-token.yaml` | `external-dns/cloudflare-api-token` | external-dns (Cloudflare DNS records) |
 | `pathfinder-env.yaml` | `pathfinder/pathfinder-env` | Pathfinder app (API keys) |
 | `pathfinder-login.yaml` | `pathfinder/pathfinder-login` | Traefik basic auth in front of Pathfinder |
-| `argocd-notifications-secret.yaml` | `argocd/argocd-notifications-secret` | Argo CD email alerts |
+| `argocd-notifications-secret.yaml` | `argocd/argocd-notifications-secret` | Argo CD email alerts (not made yet) |
 
 ## Seal a Secret
 
-Run on k3s-1 (it needs to reach the controller):
+Run anywhere `kubectl` reaches the cluster (kubeseal fetches the controller's public key):
 
 ```sh
 kubectl create secret generic <name> -n <namespace> \
