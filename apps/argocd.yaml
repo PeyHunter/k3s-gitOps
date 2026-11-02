@@ -20,7 +20,60 @@ spec:
         dex:
           enabled: false
         notifications:
-          enabled: false
+          enabled: true
+          # Secret is made by hand (kubectl), not by Helm, so the password stays out of git.
+          secret:
+            create: false
+          notifiers:
+            service.email.gmail: |
+              host: smtp.gmail.com
+              port: 465
+              from: $email-username
+              username: $email-username
+              password: $email-password
+          subscriptions:
+            - recipients:
+                - email:YOUR_GMAIL@gmail.com
+              triggers:
+                - on-sync-failed
+                - on-health-degraded
+                - on-sync-status-unknown
+          templates:
+            template.app-sync-failed: |
+              email:
+                subject: "[k3s-1] Sync FAILED: {{.app.metadata.name}}"
+              message: |
+                The sync of {{.app.metadata.name}} failed at {{.app.status.operationState.finishedAt}}.
+                Error: {{.app.status.operationState.message}}
+                {{.context.argocdUrl}}/applications/{{.app.metadata.name}}?operation=true
+            template.app-health-degraded: |
+              email:
+                subject: "[k3s-1] Degraded: {{.app.metadata.name}}"
+              message: |
+                {{.app.metadata.name}} is Degraded (something inside it is not running right).
+                {{.context.argocdUrl}}/applications/{{.app.metadata.name}}
+            template.app-sync-status-unknown: |
+              email:
+                subject: "[k3s-1] Status unknown: {{.app.metadata.name}}"
+              message: |
+                Argo can't work out the state of {{.app.metadata.name}}.
+                Usually the repo is unreachable or the manifests don't render.
+                {{range .app.status.conditions}}{{.type}}: {{.message}}
+                {{end}}
+                {{.context.argocdUrl}}/applications/{{.app.metadata.name}}
+          triggers:
+            trigger.on-sync-failed: |
+              - description: Sync has failed
+                send: [app-sync-failed]
+                when: app.status.operationState != nil and app.status.operationState.phase in ['Error', 'Failed']
+            trigger.on-health-degraded: |
+              - description: App has degraded
+                send: [app-health-degraded]
+                when: app.status.health.status == 'Degraded'
+            trigger.on-sync-status-unknown: |
+              - description: Sync status is Unknown
+                send: [app-sync-status-unknown]
+                when: app.status.sync.status == 'Unknown'
         server:
           ingress:
             enabled: true
