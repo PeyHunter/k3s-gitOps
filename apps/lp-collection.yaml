@@ -13,7 +13,7 @@ spec:
     path: deploy
     kustomize:
       images:
-        - ghcr.io/peyhunter/lp-collection:sha-0dc2309
+        - ghcr.io/peyhunter/lp-collection:sha-6b50e51
   destination:
     server: https://kubernetes.default.svc
     namespace: lp-collection
