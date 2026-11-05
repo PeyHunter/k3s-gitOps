@@ -1,0 +1,20 @@
+# The root app picks this up automatically. Manifests live in the app repo (deploy/);
+# its CI bumps the image tags there.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tech-update
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/PeyHunter/tech-update.git
+    targetRevision: main
+    path: deploy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: tech-update
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
