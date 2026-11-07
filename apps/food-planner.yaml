@@ -1,0 +1,21 @@
+# Manifests live in the app repo (deploy/); its CI bumps the image tags there.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: food-planner
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/PeyHunter/food-planner.git
+    targetRevision: main
+    path: deploy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: food-planner
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
