@@ -1,0 +1,35 @@
+# incidental's Postgres, made by CloudNativePG. Pinned to k3s-2 (the laptop).
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: incidental-db
+  namespace: incidental
+spec:
+  instances: 1
+  storage:
+    size: 1Gi
+    storageClass: local-path
+  bootstrap:
+    initdb:
+      database: incidental
+      owner: incidental
+  affinity:
+    nodeSelector:
+      kubernetes.io/hostname: k3s-2
+  # Same fix as your food-planner and lp-collection Postgres: kernel 7.0's
+  # default AppArmor profile blocks signals between postgres processes.
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 26
+    runAsGroup: 26
+    fsGroup: 26
+    seccompProfile:
+      type: RuntimeDefault
+    appArmorProfile:
+      type: Unconfined
+  resources:
+    requests:
+      cpu: 20m
+      memory: 96Mi
+    limits:
+      memory: 512Mi

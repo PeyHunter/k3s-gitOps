@@ -1,0 +1,19 @@
+# incidental's Postgres (the Cluster object in incidental/).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: incidental-db
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/PeyHunter/k3s-gitops.git
+    targetRevision: main
+    path: incidental
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: incidental
+  syncPolicy:
+    automated:
+      prune: false        # never auto-delete the database
+      selfHeal: true
