@@ -1,0 +1,33 @@
+# CloudNativePG: the operator that runs Postgres databases for you. Lives on k3s-2.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cloudnative-pg
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/PeyHunter/k3s-gitops.git
+    targetRevision: main
+    path: charts/cloudnative-pg
+    helm:
+      releaseName: cnpg
+      valuesObject:
+        nodeSelector:
+          kubernetes.io/hostname: k3s-2   # run on the laptop, not the boss
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cnpg-system
+  syncPolicy:
+    automated:
+      prune: false        # never auto-delete the operator or its CRDs
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true   # the CRDs are too big for a normal apply
