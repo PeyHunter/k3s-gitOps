@@ -1,0 +1,41 @@
+# incidental: KAOS's memory (the API). Its database is incidental-db (step 4).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: incidental
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/PeyHunter/k3s-gitops.git
+    targetRevision: main
+    path: charts/incidental
+    helm:
+      releaseName: incidental
+      valuesObject:
+        image:
+          registry: git.shine.town
+          repository: infra/incidental/incidental-api
+          tag: "0.1.0-20251208-d9b6038"   # the chart's default tag does not exist
+        database:
+          existingSecret: incidental-db-app   # made by CloudNativePG in step 4
+          cnpg:
+            enabled: false                    # don't make a second database
+        nodeSelector:
+          kubernetes.io/hostname: k3s-2
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            memory: 128Mi
+        bootstrap:
+          existingSecret: incidental-bootstrap   # remove in step 6d
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: incidental
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+

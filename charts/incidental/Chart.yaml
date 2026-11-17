@@ -1,0 +1,9 @@
+apiVersion: v2
+appVersion: 0.1.0
+description: Temporal incident store (API + Postgres) for Kubernetes operator agents.
+  Event-sourced, bitemporal, machine-first.
+name: incidental
+sources:
+- https://github.com/sshine/kube.mechanicus.xyz
+type: application
+version: 0.1.0

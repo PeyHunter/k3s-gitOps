@@ -1,0 +1,22 @@
+{{- if .Values.database.cnpg.enabled }}
+# CloudNativePG database for the store. The operator generates the
+# `{{ include "incidental.fullname" . }}-db-app` secret whose `uri` key the
+# deployment consumes.
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: {{ include "incidental.fullname" . }}-db
+  labels:
+    {{- include "incidental.labels" . | nindent 4 }}
+spec:
+  instances: {{ .Values.database.cnpg.instances }}
+  storage:
+    size: {{ .Values.database.cnpg.storage.size }}
+    {{- with .Values.database.cnpg.storage.storageClass }}
+    storageClass: {{ . }}
+    {{- end }}
+  bootstrap:
+    initdb:
+      database: incidental
+      owner: incidental
+{{- end }}

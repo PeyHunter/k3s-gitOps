@@ -1,0 +1,16 @@
+incidental {{ .Chart.AppVersion }} deployed as {{ include "incidental.fullname" . }}.
+
+API (in-cluster): http://{{ include "incidental.fullname" . }}.{{ .Release.Namespace }}.svc:{{ .Values.service.port }}
+
+{{- if .Values.bootstrap.existingSecret }}
+
+Bootstrap is enabled. Mint the first real token, then remove the
+bootstrap secret and upgrade the release:
+
+  kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "incidental.fullname" . }} 8080:{{ .Values.service.port }}
+  export INCIDENTAL_TOKEN=$(kubectl -n {{ .Release.Namespace }} get secret {{ .Values.bootstrap.existingSecret }} -o jsonpath='{.data.token}' | base64 -d)
+  incidentctl token create --name kaos --actor-kind agent --actor-name kaos --actor-version 0.1.0
+{{- end }}
+
+Spec §9 reminder: the store should not run on the cluster it observes —
+it has to be up precisely when that cluster is on fire.

@@ -22,3 +22,8 @@ version = "2.20.0"
 repo = "https://cloudnative-pg.github.io/charts/"
 chart = "cloudnative-pg"
 version = "0.29.1"
+
+[incidental]
+oci = "oci://git.shine.town/infra/charts/incidental"
+chart = "incidental"
+version = "0.1.0"

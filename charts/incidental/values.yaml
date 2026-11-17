@@ -1,0 +1,75 @@
+replicaCount: 1
+
+image:
+  registry: ""
+  repository: incidental-api
+  # Defaults to the chart appVersion.
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 8080
+
+database:
+  # Existing secret holding the Postgres connection URI. Ignored when
+  # cnpg.enabled is true (the CNPG-generated `<fullname>-db-app` secret is
+  # used instead). CloudNativePG's app secrets use the key `uri`.
+  existingSecret: ""
+  secretKey: uri
+  cnpg:
+    # Create a CloudNativePG Cluster (`<fullname>-db`) next to the API.
+    # Requires the CloudNativePG operator. Note spec §9: prefer running
+    # the store (and its database) OFF the cluster it observes.
+    enabled: false
+    instances: 1
+    storage:
+      size: 10Gi
+      storageClass: ""
+
+bootstrap:
+  # Existing secret with key `token`: plaintext bootstrap token used to
+  # mint the first real API token, then remove it.
+  existingSecret: ""
+  actor: bootstrap
+
+logJson: true
+
+# Extra environment variables for the API container.
+extraEnv: []
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 256Mi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  runAsGroup: 65534
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+metrics:
+  serviceMonitor:
+    # Requires the Prometheus operator CRDs.
+    enabled: false
+    interval: 30s
+    labels: {}
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}
